@@ -257,6 +257,7 @@ function restartServer() {
 
 function showReferences(uri: string, pos: vscode.Position) {
     const u = vscode.Uri.parse(uri);
+    
     const p = new vscode.Position(pos.line, pos.character);
     vscode.commands.executeCommand("vscode.executeReferenceProvider", u, p).then(locations => {
         vscode.commands.executeCommand("editor.action.showReferences", u, p, locations);
