@@ -235,7 +235,7 @@ async function doStartServer() {
         const exePath = javaExecutablePath || "java";
         serverOptions = {
             command: exePath,
-            args: ["-cp", cp, "com.tang.vscode.MainKt", "-XX:+UseG1GC", "-XX:+UseStringDeduplication"]
+            args: ["-cp", cp, "com.tang.vscode.MainKt", "-Xmx4096m"]
         };
     }
 
