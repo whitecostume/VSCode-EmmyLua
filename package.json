@@ -2,7 +2,7 @@
     "name": "emmylua",
     "displayName": "EmmyLua",
     "description": "EmmyLua for vscode",
-    "version": "0.5.19",
+    "version": "0.6.2",
     "icon": "res/icon.png",
     "publisher": "whiteye",
     "engines": {
@@ -32,10 +32,6 @@
             {
                 "command": "emmy.insertEmmyDebugCode",
                 "title": "EmmyLua: Insert Emmy Debugger Code"
-            },
-            {
-                "command": "emmlua.syntax.view",
-                "title": "EmmyLua: View Syntax Tree"
             },
             {
                 "command": "emmlua.stopServer",
@@ -284,6 +280,11 @@
                     "default": [],
                     "description": "%emmylua.source.roots%"
                 },
+                "emmylua.new.languageServer": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%emmylua.new.languageServer%"
+                },
                 "emmylua.completion.caseSensitive": {
                     "type": "boolean",
                     "default": false,
@@ -465,7 +466,7 @@
     "devDependencies": {
         "@types/mocha": "^9.1.0",
         "@types/node": "^17.0.21",
-        "@types/vscode": "1.79.0",
+        "@types/vscode": "1.82.0",
         "download": "^7.1.0",
         "eslint": "^8.11.0",
         "filecopy": "^4.0.2",
@@ -476,6 +477,7 @@
         "@vscode/debugprotocol": "^1.61.0",
         "iconv-lite": "^0.6.3",
         "smart-buffer": "^4.0.1",
-        "vscode-languageclient": "8.0.2"
+        "vscode-languageclient": "9.0.1",
+        "concat-map": "0.0.2"
     }
 }
