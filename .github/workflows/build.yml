@@ -48,6 +48,6 @@ jobs:
     if: success() && startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v2
-      - run: npx vsce publish --packagePath $(find emmylua- -iname *.vsix)
+      - run: npx vsce publish --packagePath $(find VSCode-EmmyLua -iname *.vsix)
         env:
           VSCE_PAT: ${{ secrets.VSCE_ACCESS_TOKEN }}
