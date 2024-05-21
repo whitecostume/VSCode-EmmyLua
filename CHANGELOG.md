@@ -2,6 +2,241 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# 0.7.0
+
+`NEW` dotnet实现的语言服务开始正式替代java版本的语言服务, java版本的语言服务将来会在1.0版本移除, 现在会以legacy的形式启用
+
+# 0.6.18
+
+`NEW` 支持`---@verson`注解, 格式为: `---@version [>|<|>=|<=] [<framework>] <version>, ...`
+
+`NEW` 支持配置`runtime.frameworkVersions`, 配置格式为:
+```json
+{
+  "runtime": {
+    "frameworkVersions": [
+      "openresty 1.2.0"
+    ]
+  }
+}
+```
+
+`NEW` 支持 diagnostic.globalsRegex, 用于配置全局变量的正则表达式, 例如:
+```json
+{
+  "diagnostics": {
+    "globalsRegex": [
+      "^ngx\\."
+    ]
+  }
+}
+```
+
+`NEW` 优化代码补全, 支持tablefield补全, 支持元字段补全
+
+`NEW` 支持CodeLens功能, 通过配置codeLens.enable开启, 例如:
+```json
+{
+  "codeLens": {
+    "enable": true
+  }
+}
+```
+
+`NEW` EmmyLuaAnalyzer项目新增EmmyLua.Cli工程, 用于生成文档, 代码检查等功能.
+
+`NEW` 命令行工具支持生成文档目前实现非常简陋需要优化.
+
+`FIX` 修复不少细节上的BUG
+
+# 0.6.17
+
+`NEW` 重构声明算法, 优化Hover时的提示, 现在hover时, 会展开alias的选项, 并且增加Go to 类型的跳转 
+
+`NEW` 兼容LuaLs的一些跨行联合语法
+
+`NEW` 生成了schema.json文件, 用于支持json文件的补全
+
+`NEW` 新增deprecated的渲染, 和一些私有字段的访问检查
+
+`NEW` 新增配置用于设置autoRequire时的补全函数名以及文件命名法的转换
+
+# 0.6.16
+
+`NEW` 重构算法, 优化内存占用, 减少30%的内存占用
+
+`NEW` 支持工作区符号搜索
+
+# 0.6.15
+
+`FIX` 修复配置类的初始化问题导致的documentLink报错
+
+`NEW` 现在所有能够填写路径的地方, 都支持相对路径, 绝对路径, 以及$`${workspaceFolder}`指代工作区 `~`指代用户目录
+
+# 0.6.14
+
+`NEW` 增加inlayHint配置, 实现localHint和overrideHint
+
+`NEW` 实现DocumentLink功能, 可以跳转到相关文件
+
+`NEW` 实现字符串中的资源文件补全, 需要添加配置:
+```json
+{
+  "resource": {
+    "paths": [
+      "absolute path to resource folder"
+    ],
+  }
+}
+```
+
+
+# 0.6.13
+
+`FIX` 修复右侧表达式为unknown时, 左侧类型会被强制转换为匿名类型的问题
+
+# 0.6.12
+
+`NEW` 实现后缀补全功能, 输入标识符后输入 '@' 即可获得后缀补全
+
+`FIX` 修复双倍全局变量的问题
+
+`NEW` 兼容luals一些语法:
+* 返回类型可以是 ... 或者 ...string, 
+* 兼容 doc attribute, 例如---@enum (partial) A, 但并未实现相关功能
+* 兼容返回类型可空简化描述, 例如---@return string?, 但并未实现相关功能
+
+`NEW` 支持可变模板参数声明, 主要用于实现unpack逻辑, 例如:
+```lua
+---@generic T...
+---@param a [T...]
+---@return T...
+```
+
+`FIX` 修复hover和inlayhint时, 表结构类型的字段提示问题
+
+`FIX` 修复多返回值函数, 后续返回延续的前一个的问题
+
+`NEW` 对无法推断类型的变量, 会默认给予一个匿名类型
+
+# 0.6.10
+
+`NEW` 现在支持从配置文件配置语言服务, 你可以在工作区创建.emmyrc.json, 具体格式目前是:
+```json
+{
+  "completion": {
+    "autoRequire": true,
+    "callSnippet": false,
+    "postfix": "@"
+  },
+  "diagnostics": {
+    "disable": [],
+    "globals": []
+  },
+  "hint": {},
+  "runtime": {
+    "version": "Lua5.4"
+  },
+  "workspace": {
+    "ignoreDir": [
+      "test"
+    ],
+    "library": [],
+    "workspaceRoots": [],
+    "preloadFileSize": 2048000
+  }
+}
+```
+
+`NEW` 现在提供工作区诊断和工作区禁用诊断
+
+`NEW` 支持在工作区内配置root路径, 这样require路径将会从root开始, root可以配置多个
+
+`NEW` 支持配置第三方库目录
+
+`NEW` 支持通过_G定义全局变量, 例如_G.aa = 123, 但是找不到引用目前
+
+# 0.6.9
+
+`FIX` 修复全局变量判断问题
+
+`FIX` 修复双倍打开文件的BUG
+
+`NEW` 增加大量代码片段
+
+`NEW` 推断回调函数的参数类型
+
+`NEW` 强化inlayHint, 函数调用参数上的inlayHint可以点击跳转
+
+`NEW` 提供continue补全(转化为goto continue)
+
+`NEW` 完善诊断管理, 可以通过---@diagnostic 系列注解关闭当前行和当前文件的诊断
+
+`NEW` 提供未定义全局变量的诊断
+
+# 0.6.8
+
+`FIX` 临时把add改为TryAdd, 修复启动错误
+
+`FIX` 修复注释中的缩进显示
+
+`NEW` 隐式继承, 例如:
+```lua
+---@class A
+local a = enum {
+    aaa = 123
+}
+```
+此时A类将隐式继承右侧表达式的类型
+
+# 0.6.7
+
+`FIX` 修复多线程问题
+
+`FIX` 修复debug inline values过多的问题
+
+# 0.6.6
+
+`FIX` 修复一些补全问题
+
+`NEW` 增加一个显示解析进度的条
+
+`NEW` 替换插件端的debug inline values特性, 改为语言服务实现
+
+`NEW` 实现函数环境下self字段的直接补全而不用写self
+
+
+# 0.6.5
+
+`FIX` 修复部分全局变量没有标记为红色的BUG
+
+`FIX` 重新启用goto和break的相关检查
+
+`FIX` 修改项目排除逻辑
+
+`FIX` 优化内存占用
+
+`FIX` 修复重命名时光标在标识符右侧导致无法重命名的问题
+
+`FIX` 插件会在启动时试图读取`.luarc.json`文件, 功能未实现
+
+# 0.6.4
+
+`FIX` 修复双倍服务器的问题
+
+# 0.6.3
+
+`NEW` 支持emmylua经典代码渲染
+
+`FIX` 优化一点内存占用
+
+`FIX` 暂时屏蔽控制流分析给出的错误诊断
+
+`NEW` 修复索引表达式找不到引用的问题
+
+`NEW` 支持读取配置, 但是目前没有作用
+
+
 ## 0.6.2
 
 `FIX` 不索引大文件(超过200kb)

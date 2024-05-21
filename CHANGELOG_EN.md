@@ -1,5 +1,237 @@
 # Change Log
 
+# 0.7.0
+
+`NEW` The language service implemented in dotnet officially begins to replace the Java version of the language service. The Java version of the language service will be removed in version 1.0 and is now enabled in a legacy form.
+
+# 0.6.18
+
+`NEW` Support for `---@verson` annotation, format: `---@version [>|<|>=|<=] [<framework>] <version>, ...`
+
+`NEW` Support for configuring `runtime.frameworkVersions`, configuration format is:
+```json
+{
+  "runtime": {
+    "frameworkVersions": [
+      "openresty 1.2.0"
+    ]
+  }
+}
+```
+
+`NEW` Support for diagnostic.globalsRegex, used to configure the regular expression for global variables, for example:
+```json
+{
+  "diagnostics": {
+    "globalsRegex": [
+      "^ngx\\."
+    ]
+  }
+}
+```
+
+`NEW` Optimized code completion, support for tablefield completion, support for metatable field completion
+
+`NEW` Support for CodeLens feature, enabled by configuring codeLens.enable, for example:
+```json
+{
+  "codeLens": {
+    "enable": true
+  }
+}
+```
+
+`NEW` The EmmyLuaAnalyzer project adds the EmmyLua.Cli project, used for generating documentation, code checking and other functions.
+
+`NEW` The command line tool supports generating documentation, the current implementation is very rudimentary and needs optimization.
+
+`FIX` Fixed many details of BUG
+
+# 0.6.17
+
+`NEW` Refactored the declaration algorithm, optimized the hover prompt. Now when hovering, alias options will be expanded, and a Go to type jump is added.
+
+`NEW` Compatible with some of LuaLs's multiline union syntax.
+
+`NEW` Generated a schema.json file to support completion in json files.
+
+`NEW` Added rendering for deprecated, and some private field access checks.
+
+`NEW` Added configuration for setting function names and file naming conventions for autoRequire completion.
+
+# 0.6.16
+
+`NEW` Refactored algorithm, optimized memory usage, reduced memory usage by 30%
+
+`NEW` Supports workspace symbol search
+
+# 0.6.15
+
+`FIX` Fixed the documentLink error caused by the initialization problem of the configuration class
+
+`NEW` Now all places where paths can be filled support relative paths, absolute paths, and `$ {workspaceFolder}` to represent the workspace, `~` to represent the user directory
+
+# 0.6.14
+
+`NEW` Added inlayHint configuration, implemented localHint and overrideHint
+
+`NEW` Implemented DocumentLink feature, can jump to related files
+
+`NEW` Implemented resource file completion in strings, requires adding configuration:
+```json
+{
+  "resource": {
+    "paths": [
+      "absolute path to resource folder"
+    ],
+  }
+}
+```
+
+# 0.6.13
+
+`FIX` Fixed the issue where the left-hand type would be forcibly converted to an anonymous type when the right-hand expression is unknown.
+
+# 0.6.12
+
+`NEW` Implemented suffix completion feature, type '@' after an identifier to get suffix completion
+
+`FIX` Fixed the issue of double global variables
+
+`NEW` Compatible with some luals syntax:
+* Return type can be ... or ...string,
+* Compatible with doc attribute, for example---@enum (partial) A, but the related function is not implemented
+* Compatible with simplified description of nullable return type, for example---@return string?, but the related function is not implemented
+
+`NEW` Support for variable template parameter declaration, mainly used to implement unpack logic, for example:
+```lua
+---@generic T...
+---@param a [T...]
+---@return T...
+```
+
+# 0.6.10
+
+`NEW` Now supports configuring the language service from the configuration file, you can create .emmyrc.json in the workspace, the specific format is currently:
+
+```json
+{
+  "completion": {
+    "autoRequire": true,
+    "callSnippet": false,
+    "postfix": "@"
+  },
+  "diagnostics": {
+    "disable": [],
+    "globals": []
+  },
+  "hint": {},
+  "runtime": {
+    "version": "Lua5.4"
+  },
+  "workspace": {
+    "ignoreDir": [
+      "test"
+    ],
+    "library": [],
+    "workspaceRoots": [],
+    "preloadFileSize": 2048000
+  }
+}
+```
+
+`NEW` Now provides workspace diagnostics and workspace disable diagnostics
+
+`NEW` Supports configuring the root path within the workspace, so the require path will start from the root, and multiple roots can be configured
+
+`NEW` Supports configuring third-party library directories
+
+`NEW` Supports defining global variables through _G, for example _G.aa = 123, but the reference cannot be found currently
+
+# 0.6.9
+
+`FIX` Fixed global variable detection issue
+
+`FIX` Fixed double opening file bug
+
+`NEW` Added a large number of code snippets
+
+`NEW` Inferred parameter types for callback functions
+
+`NEW` Enhanced inlayHint, inlayHint on function call parameters can be clicked to jump
+
+`NEW` Provided continue completion (converted to goto continue)
+
+`NEW` Improved diagnostic management, can disable diagnostics for current line and current file using ---@diagnostic annotations
+
+`NEW` Provided diagnostics for undefined global variables
+
+# 0.6.8
+
+`FIX` Temporarily change add to TryAdd, fix startup error
+
+`FIX` Fix indentation in comments.
+
+`NEW` Implicit inheritance, e.g..
+```lua
+---@class A
+local a = enum {
+    aaa = 123
+}
+```
+At this point, class A will implicitly inherit the type of the right-hand expression
+
+# 0.6.7
+
+`FIX` Fix multithreading problem.
+
+`FIX` Fix debug inline values being too high
+
+# 0.6.6
+
+`FIX` Fixed some completion issues
+
+`NEW` Added a progress bar for parsing
+
+`NEW` Replaced the debug inline values feature on the plugin side with language service implementation
+
+`NEW` Implemented direct completion of the `self` field in function context without having to write `self`
+
+# 0.6.5
+
+`FIX` Fixed the bug where some global variables were not marked in red
+
+`FIX` Re-enabled checks for goto and break statements
+
+`FIX` Modified project exclusion logic
+
+`FIX` Optimized memory usage
+
+`FIX` Fixed the issue where renaming failed when the cursor was on the right side of the identifier
+
+`FIX` The plugin attempts to read the `.luarc.json` file at startup, but the functionality is not implemented
+
+# 0.6.4
+
+`FIX` Fixed the issue with duplicate servers
+
+# 0.6.3
+
+`NEW` Support classic code rendering for EmmyLua
+
+`FIX` Optimize memory usage slightly
+
+`FIX` Temporarily disable error diagnostics from control flow analysis
+
+`NEW` Fix the issue of not finding references for index expressions
+
+`NEW` Support reading configurations, but currently has no effect
+
+
+## 0.6.2
+
+`FIX` Do not index large files (over 200kb)
+
 ## 0.6.1
 
 `FIX` Fixed type parsing error for types like { x:number }
