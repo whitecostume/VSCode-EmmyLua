@@ -77,7 +77,7 @@ function registerDebuggers() {
         context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('emmylua_attach', factory));
         context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('emmylua_launch', factory));
     }
-    if (!ctx.oldLanguageServer) {
+    if (ctx.oldLanguageServer) {
         context.subscriptions.push(vscode.languages.registerInlineValuesProvider('lua', {
             // 不知道是否应该发到ls上再做处理
             // 先简单处理一下吧
@@ -173,7 +173,7 @@ async function validateJava(): Promise<void> {
 
 async function startServer() {
     try {
-        if (!ctx.debugMode && !ctx.oldLanguageServer) {
+        if (!ctx.debugMode && ctx.oldLanguageServer) {
             await validateJava();
         }
     } catch (error) {
@@ -232,12 +232,12 @@ async function doStartServer() {
             });
             return Promise.resolve(result);
         };
-    } else if (!ctx.oldLanguageServer) {
+    } else if (ctx.oldLanguageServer) {
         const cp = path.resolve(context.extensionPath, "server", "*");
         const exePath = javaExecutablePath || "java";
         serverOptions = {
             command: exePath,
-            args: ["-cp", cp, "com.tang.vscode.MainKt", "-Xmx4096m"]
+            args: ["-cp", cp, "com.tang.vscode.MainKt", "-XX:+UseG1GC", "-XX:+UseStringDeduplication"]
         };
     } else {
         let platform: string = os.platform();
@@ -249,6 +249,7 @@ async function doStartServer() {
                     context.extensionPath,
                     'server',
                     'win32-x64',
+                    'win32-x64',
                     'EmmyLua.LanguageServer.exe'
                 )
                 break;
@@ -256,6 +257,7 @@ async function doStartServer() {
                 command = path.join(
                     context.extensionPath,
                     'server',
+                    'linux-x64',
                     'linux-x64',
                     'EmmyLua.LanguageServer'
                 )
@@ -267,12 +269,14 @@ async function doStartServer() {
                         context.extensionPath,
                         'server',
                         'darwin-arm64',
+                        'darwin-arm64',
                         'EmmyLua.LanguageServer'
                     );
                 } else {
                     command = path.join(
                         context.extensionPath,
                         'server',
+                        'darwin-x64',
                         'darwin-x64',
                         'EmmyLua.LanguageServer'
                     );
@@ -302,9 +306,11 @@ function restartServer() {
     }
 }
 
-function showReferences(uri: string, pos: vscode.Position) {
+function showReferences(uri: string, pos: vscode.Position | number, col?: number) {
     const u = vscode.Uri.parse(uri);
-    
+    if (typeof pos === 'number') {
+        pos = new vscode.Position(pos, col!);
+    }
     const p = new vscode.Position(pos.line, pos.character);
     vscode.commands.executeCommand("vscode.executeReferenceProvider", u, p).then(locations => {
         vscode.commands.executeCommand("editor.action.showReferences", u, p, locations);

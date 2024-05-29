@@ -1,8 +1,118 @@
 # Change Log
 
+# 0.7.2
+
+`NEW` CodeLens feature is enabled by default
+
+`NEW` Support for decimals in the form of `.1`
+
+`NEW` Workspace code diagnostics are parallelized to take full advantage of multi-core CPUs
+
+`NEW` Document diagnostics are asynchronous and include a built-in 1-second debounce mechanism to reduce the impact on performance
+
+`NEW` Document updates are delayed by 0.1 seconds, so the document content is not immediately updated when typing quickly
+
+`NEW` Optimized file monitoring update mechanism within the workspace, supporting batch updates (mainly updates from version control tools like git)
+
+`NEW` Support for callable inference of classes, for example:
+```lua
+---@class A
+---@overload fun(a, b, c): A
+A = {}
+
+local a = A(1, 2, 3) -- A
+```
+
+`NEW` Support for strict mode configuration, the current strict mode configuration is:
+```json
+{
+  "strict": {
+    "requirePath": true,
+    "typeCall": true
+  }
+}
+```
+If `requirePath` is set to `false`, it allows require paths to not start from the root directory. If `typeCall` is set to `false`, it allows direct calls of any type to return the type itself.
+
+`FIX` Fixed some inference issues
+
+`FIX` Fixed crashes caused by duplicate file additions when workspaces overlap
+
+`FIX` Fixed inline comment judgment logic
+
+`FIX` Optimized generic function inference
+
+# 0.7.1
+
+`FIX` Debugger rolled back to 1.7.1, the debugger will be updated in the next version
+
 # 0.7.0
 
 `NEW` The language service implemented in dotnet officially begins to replace the Java version of the language service. The Java version of the language service will be removed in version 1.0 and is now enabled in a legacy form.
+
+`NEW` Debugger updated to 1.8.0
+
+`NEW` Supports string generics, for example:
+```lua
+---@generic T
+---@param a `T`
+---@return T
+function TypeOf(a)
+end
+
+local a = TypeOf("string") -- string type
+```
+
+`FIX` Fixed some issues with type inference
+
+`NOTE` All vscode configurations are invalid for the dotnet version of the language service. Its configuration requires creating a .emmyrc.json file in the root directory. A template configuration is:
+
+```json
+{
+    "completion": {
+        "autoRequire": true,
+        "autoRequireFunction": "require",
+        "autoRequireNamingConvention": "snakeCase",
+        "callSnippet": false,
+        "postfix": "@"
+    },
+    "diagnostics": {
+        "disable": [
+        ],
+        "globals": [
+        ],
+        "globalRegex": [
+        ],
+        "severity": {
+        }
+    },
+    "hint": {
+        "paramHint": true,
+        "indexHint": true,
+        "localHint": false,
+        "overrideHint": true
+    },
+    "runtime": {
+        "version": "Lua5.4",
+        "requireLikeFunction": [],
+        "frameworkVersions": []
+    },
+    "workspace": {
+        "ignoreDir": [],
+        "library": [],
+        "workspaceRoots": [
+        ],
+        "preloadFileSize": 12048000
+    },
+    "resource": {
+        "paths": [
+        ]
+    },
+    "codeLens":{
+        "enable": false
+    }
+}
+```
 
 # 0.6.18
 

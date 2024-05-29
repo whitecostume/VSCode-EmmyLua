@@ -2,9 +2,122 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# 0.7.2
+
+`NEW` 默认启用codelens功能
+
+`NEW` 支持`.1`形式的小数
+
+`NEW` 工作区代码诊断并行化会充分利用多核CPU的优势
+
+`NEW` 文档诊断异步化, 并内置延迟1秒的防抖机制, 减少诊断对性能的影响
+
+`NEW` 文档更新延迟0.1秒, 在快速键入时不会马上文档的内容
+
+`NEW` 优化工作区内的文件监听更新机制, 支持批量更新(主要是git等版本管理工具的更新)
+
+`NEW` 支持类的可调用推断, 例如:
+```lua
+---@class A
+---@overload fun(a, b, c): A
+A = {}
+
+local a = A(1, 2, 3) -- A
+```
+
+`NEW` 支持严格模式配置, 当前存在的严格模式配置是:
+```json
+{
+  "strict": {
+    "requirePath": true,
+    "typeCall": true
+  }
+}
+```
+在如果设置`requirePath: false`则允许require路径不从根目录开始, 如果设置`typeCall: false`则允许对任意类型的直接调用返回类型本身.
+
+`FIX` 修复一些推断问题
+
+`FIX` 修复工作区重叠时, 因为重复添加文件导致的崩溃
+
+`FIX` 修复内联注释判断逻辑
+
+`FIX` 优化泛型函数推断
+
+# 0.7.1
+
+`FIX` 调试器回滚到1.7.1, 下个版本再更新调试器
+
 # 0.7.0
 
-`NEW` dotnet实现的语言服务开始正式替代java版本的语言服务, java版本的语言服务将来会在1.0版本移除, 现在会以legacy的形式启用
+`NEW` dotnet实现的语言服务开始正式替代java版本的语言服务, java版本的语言服务将来会在1.0版本移除, 现在可以以legacy的形式启用
+
+`NEW` 调试器更新到1.8.0
+
+`NEW` 支持字符串泛型, 例如:
+```lua
+---@generic T
+---@param a `T`
+---@return T
+function TypeOf(a)
+end
+
+local a = TypeOf("string") -- string type
+```
+
+`FIX` 修复一些类型推断上的问题
+
+`NOTE` 如果项目中的报错过多, 可以按ctrl . 然后选择禁用这个诊断, 如果你的项目中是.lua.txt为后缀, 请在配置中的extensions里面添加.lua.txt, 然后重启vscode
+
+`NOTE` 所有的vscode配置对于dotnet版本的语言服务都是无效的, 他的配置需要在根目录创建.emmyrc.json文件, 一个模板配置是:
+
+```json
+{
+    "completion": {
+        "autoRequire": true,
+        "autoRequireFunction": "require",
+        "autoRequireNamingConvention": "snakeCase",
+        "callSnippet": false,
+        "postfix": "@"
+    },
+    "diagnostics": {
+        "disable": [
+        ],
+        "globals": [
+        ],
+        "globalRegex": [
+        ],
+        "severity": {
+        }
+    },
+    "hint": {
+        "paramHint": true,
+        "indexHint": true,
+        "localHint": false,
+        "overrideHint": true
+    },
+    "runtime": {
+        "version": "Lua5.4",
+        "requireLikeFunction": [],
+        "frameworkVersions": [],
+        "extensions": []
+    },
+    "workspace": {
+        "ignoreDir": [],
+        "library": [],
+        "workspaceRoots": [
+        ],
+        "preloadFileSize": 12048000
+    },
+    "resource": {
+        "paths": [
+        ]
+    },
+    "codeLens":{
+        "enable": false
+    }
+}
+```
 
 # 0.6.18
 

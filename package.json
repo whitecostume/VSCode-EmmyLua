@@ -2,11 +2,11 @@
     "name": "emmylua",
     "displayName": "EmmyLua",
     "description": "EmmyLua for vscode",
-    "version": "0.7.0",
+    "version": "0.7.2",
     "icon": "res/icon.png",
     "publisher": "whiteye",
     "engines": {
-        "vscode": "^1.82.0"
+        "vscode": "^1.89.0"
     },
     "categories": [
         "Programming Languages",
@@ -439,6 +439,10 @@
             {
                 "fileMatch": "emmy.config.json",
                 "url": "./syntaxes/emmy.config.schema.json"
+            },
+            {
+                "fileMatch": ".emmyrc.json",
+                "url": "./syntaxes/schema.json"
             }
         ],
         "colors": [],
@@ -460,7 +464,8 @@
     "devDependencies": {
         "@types/mocha": "^9.1.0",
         "@types/node": "^17.0.21",
-        "@types/vscode": "1.82.0",
+        "@types/vscode": "1.89.0",
+        "@vscode/vsce": "2.26.1",
         "download": "^7.1.0",
         "eslint": "^8.11.0",
         "filecopy": "^4.0.2",
