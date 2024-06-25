@@ -1,5 +1,80 @@
 # Change Log
 
+# 0.7.7
+
+`FIX` Fixed the bug where the language service reports an error when \u{xxx} is in the invalid area of UTF8 encoding
+
+`FIX` Global variables are now kept unique. If a global variable definition uses emmylua doc somewhere, it is the priority definition, otherwise it is a random definition
+
+`FIX` Avoid infinite recursive inference when alias is recursively defined
+
+`FIX` Fixed some inference bugs
+
+`FIX` Optimized document prompts for hover and completion items
+
+`CHG` Now variables will not directly equal the type of the right-hand expression. Each variable has an anonymous independent type to prevent the type returned from the expression from being modified
+
+`FIX` Fixed the inference problem of the return type of class-like functions to avoid countless types of unions
+
+# 0.7.6
+
+`FIX` Fixed the issue of parent class completion not working
+
+`NEW` Added support for unpacking arrays
+
+# 0.7.5
+
+`FIX` Optimized subclass inference to avoid infinite recursion
+
+`FIX` Cleaned up code, optimized memory usage, improved effective use of data structures, and reduced memory fragmentation.
+
+`FIX` Fixed a memory leak issue
+
+`NEW` Added new diagnostic algorithms: `no-discard`, `missing-parameter`, `disable-global-define`, `undefined-field`, `local-const-reassign`. Among them, `disable-global-define`, `undefined-field` are turned off by default.
+
+`NEW` Added diagnostic enable configuration:
+```json
+{
+  "diagnostics": {
+    "enables": [
+      "disable-global-define",
+      "undefined-field",
+    ]
+  }
+}
+```
+
+`FIX` Optimized code snippet completion
+
+# 0.7.4
+
+NO CHANGE
+
+# 0.7.3
+
+`CHG` Cancelled the document delay update
+
+`NEW` Optimized the stored syntax nodes from class to struct, reducing memory usage, approximately reducing memory usage by 30%
+
+`NEW` Optimized the snippet completion of pairs and ipairs implemented by `@whitecostume`
+
+`NEW` Allowed `---@type` to act on tableField, for example:
+```lua
+local t = {
+    ---@type string
+    aa = 1
+}
+```
+
+`CHG` Refactored the declaration and index system, preparing for other plugins
+
+`FIX` Fixed some inference bugs
+
+`FIX` Implemented visibility check as correctly as possible. Visibility check supports @private, @public, @protected, @package annotations, which represent private, public, protected, package four kinds of visibility. The so-called package visibility refers to visibility within the same file
+
+`NEW` The language service will now read file association configurations from the vscode plugin end to ensure correct analysis of suffixes like .lua.txt
+
+
 # 0.7.2
 
 `NEW` CodeLens feature is enabled by default

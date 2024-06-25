@@ -2,6 +2,81 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# 0.7.7
+
+`FIX` 修复\u{xxx}为UTF8编码无效区的时候语言服务报错的BUG
+
+`FIX` 全局变量现在保持唯一, 如果某处全局变量的定义使用了emmylua doc, 则为优先定义, 否则为随机定义
+
+`FIX` alias递归定义时, 避免无限递归推断
+
+`FIX` 修复一些推断上的BUG
+
+`FIX` 优化悬浮和补全项的文档提示
+
+`CHG` 现在变量不会直接等同右侧表达式类型, 每个变量拥有一个匿名的独立类型, 防止从表达式返回的类型被修改
+
+`FIX` 修复class类似的函数返回类型推断问题, 避免无数类型发生联合
+
+# 0.7.6
+
+`FIX` 修复父类补全失效
+
+`NEW` 支持unpack对数组的展开 
+
+# 0.7.5
+
+`FIX` 优化子类推断, 避免出现无限递归
+
+`FIX` 清理代码, 优化内存占用, 提高数据结构的有效占用, 降低内存碎片.
+
+`FIX` 修复一个内存泄漏问题
+
+`NEW` 新增诊断算法: `no-discard`, `missing-parameter`, `disable-global-define`, `undefined-field`, `local-const-reassign`, 其中`disable-global-define`, `undefined-field` 默认关闭.
+
+`NEW` 新增诊断启用配置:
+```json
+{
+  "diagnostics": {
+    "enables": [
+      "disable-global-define",
+      "undefined-field",
+    ]
+  }
+}
+
+```
+
+`FIX` 优化了代码片段补全
+
+# 0.7.4
+
+0.7.3更新失败, 版本号挺高到0.7.4
+
+# 0.7.3
+
+`CHG` 取消了文档延迟更新
+
+`NEW` 将存储的语法节点由class优化为struct, 减少内存占用, 大概减少了30%的内存占用
+
+`NEW` 优化了pairs和ipairs的片段补全`@whitecostume`实现
+
+`NEW` 允许`---@type` 作用于tableField上, 例如:
+```lua
+local t = {
+    ---@type string
+    aa = 1
+}
+```
+
+`CHG` 重构了声明和索引体系, 为其他插件做准备
+
+`FIX` 修复一些推断上的BUG
+
+`FIX` 尽可能正确的实现可见性检查, 可见性检查支持`@private`, `@public`, `@protected`, `@package` 注解, 他分别代表`私有`, `公有`, `保护`, `包`四种可见性, 所谓的包可见性, 指的是在相同文件内可见
+
+`NEW` 语言服务现在会从vscode插件端读取文件关联配置, 确保`.lua.txt`等后缀的正确分析
+
 # 0.7.2
 
 `NEW` 默认启用codelens功能
