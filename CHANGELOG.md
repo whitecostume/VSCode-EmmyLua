@@ -2,6 +2,268 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# next
+
+下一个版本从0.9.0开始, 将重点实现类型检查
+
+# 0.8.20
+
+`FIX` 修复了连续调用时函数签名判断错误
+
+`FIX` 修复alias类型作为key时的推断问题
+
+`FIX` 修复了常整数field补全失效的问题:
+```lua
+---@class A
+---@field [1] string
+local a
+a[1] -- now can completion
+```
+
+`NEW` 优化了语义token, 他仅仅作用于doc
+
+`NOTE` 0.8.20 作为 0.8.x 系列最后一个发布版本, 后续版本号将升级到0.9.0
+
+# 0.8.18
+
+`FIX` 修复参数为enum和alias时的代码补全列表包含了过多的引号
+
+`FIX` 修复调试时inlineValues没有生效的问题
+
+`NEW` '_' 不被视为未使用变量
+
+`NEW` 枚举类型可以作为key, 参与推断
+
+`NEW` 添加新的doc片段补全`param;@return`在函数语句上选择时会自动补全参数和return的doc
+
+`NEW` 修复在intellij平台上多根目录的错误
+
+`NEW` 支持代码格式化, 该功能通过pinvoke引用`EmmyLuaCodeStyle`实现
+
+`NEW` VScode-EmmyLua-Unity插件已经发布, 使用Xlua的用户可以试着安装使用
+
+`NEW` Intellij-EmmyLua2插件已经发布, jetbrain平台的用户可以试着使用该插件, 该插件内部集成vscode中所用的`EmmyLuaAnalyzer`, `EmmyLuaCodeStyle` 和`EmmyLuaDebugger`, 未来还会上架`intellij-emmylua2-unity`和`intellij-emmylua2-attachdebugger`
+
+`NEW` 新增配置文档: https://github.com/CppCXY/EmmyLuaAnalyzer/blob/master/docs/.emmyrc.json_CN.md
+
+# 0.8.17
+
+`FIX` 修复linux目录错误的问题
+
+`FIX` 修复table<TKey, TValue>注解的相关推断问题
+
+`FIX` 修复全局变量如果标记了class, 则在其他地方找不到引用的BUG
+
+`NEW` 支持注解`@source "<uri>#<line>:<col>"`当字段拥有该注解时, 跳转会跳转到该source指定的位置
+
+`NEW` VSCode-EmmyLua-Unity不久(2024年8月8日)会发布, 使用该插件导出的API, 会依据xlua的规则导出对应的API, 并且字段支持跳转到对应的C#实现
+
+`NEW` 枚举注解`@enum` 支持`key` attribute, 例如:
+```lua
+---@enum (key) AAA
+---| CS.A.B.C
+```
+这样在代码补全时, 会自动补全为`CS.A.B.C`而不是`AAA.CS.A.B.C`
+
+# 0.8.16
+
+`CHG` 所有函数的函数返回值被视为新的实例, 对其返回值的修改在不同实例之间互相独立
+
+`FIX` 修复_G无法提示和添加全局变量的BUG
+
+`FIX` 修复table泛型无法参与推断的BUG
+
+`NEW` 引入特殊泛型类型, `namespace<T : string>`, 该类型会试图引用命名空间例如:
+```lua
+CS = {
+    ---@type namespace<"UnityEngine">
+    UnityEngine = {},
+    ---@type namespace<"System">
+    System = {},
+}
+
+```
+
+
+# 0.8.15
+
+`CHG` 重构底层类型系统, 重构索引系统
+
+`FIX` 修复inline values计算错误
+
+`FIX` 修复return注解被函数返回类型覆盖的BUG
+
+`FIX` 修复param注解无法作用于for in 语句参数的bug
+
+`FIX` 修复private和protected可见性的诊断问题
+
+`CHG` 改变类型的成员逻辑, 现在不允许类型成员被随意扩展, 具体表现为:
+* 如果一个local变量被标记为`---@class`则其他文件无法为该类注入成员
+* 如果一个全局变量被标记为`---@class`则可以在其他文件为该类注入成员
+* 一个local变量作为模块被return出去后, 其他文件不能为该模块注入成员
+* 一个全局变量可以在任意文件注入成员
+
+`NEW` 支持class的attribute语法, 例如: `---@class (partial) A`, `---@enum (partial) B`
+
+`MEW` 支持部分类注解`partial`, 如果一个类被标记为部分类, 则在其他文件中需要再声明为部分类才能扩展其成员, 例如字符串类型的扩展:
+```lua
+---@class (partial) string
+local string = string
+
+function string:split(sep)
+end
+```
+
+`NEW` 支持精确类注解`exact`, 如果一个类被标记为精确类, 则只允许使用和定义通过`---@field`注解指定的成员例如:
+
+```lua
+---@class (exact) AA
+---@field a number
+local AA = {}
+
+AA.b = 123 -- error
+AA.a = 456 -- ok
+
+```
+
+`NEW` 诊断支持`inject-field-fail`, 该诊断默认关闭
+
+`NEW` 诊断支持`duplicate-type`, 该诊断默认开启
+
+`NEW` 代码补全会根据可见性, 屏蔽不能看见的成员
+
+`NEW` 引入命名空间注解`---@namespace`, 用于标记当前文件的命名空间, 例如:
+```lua
+---@namespace System
+```
+在当前文件指定命名空间后, 该文件定义的所有类型会处于当前命名空间下, 同一命名空间下的类不需要写命名空间前缀即可访问
+
+`NEW` 引入using注解`---@using`, 用于方便引用其他命名空间的类型, 例如:
+```lua
+---@using System
+```
+在当前文件指定using后, 该文件可以直接使用System命名空间下的类型, 例如:
+```lua
+-- A.lua
+
+---@namespace System
+---@class FFI
+
+
+-- B.lua
+---@using System
+
+---@type FFI
+
+--- C.lua
+---@type System.FFI
+```
+
+`NEW` 类型定义时, 若存在`.`分割的名称, 则会自动创建命名空间, 例如:
+```lua
+---@class System.FFC
+```
+
+`NEW` 引用查找规则优化, 通过当前类的成员查找引用时, 优先查找当前类的引用, 然后会查找所有子类的引用, 不会查找父类的引用
+
+`NEW` 代码补全优化, 代码片段补全定义函数语句时, 会模仿上一个语句的函数定义
+
+# 0.8.12
+
+`FIX` 修复代码补全的问题
+
+`FIX` 修复函数返回类型无法推断的BUG
+
+`NEW` require的路径提示支持使用`/`作为分隔符, 跳转/代码分析/文档链接均支持使用`/`作为分隔符
+
+# 0.8.11
+
+由于windows推送失败, 更新到0.8.11
+
+# 0.8.10
+
+`NEW` 将版本升级到0.8.10, 由于底层改动巨大, 所以提升数个版本号, 然而从二进制来看10版本也是2
+
+`NEW` 将dotnet版本升级到9.0预览版
+
+`CHG` 移除Newtonsoft.Json使用Text.Json, 移除omnisharp/csharp-language-server-protocol使用[`EmmyLua.LanguageServer.Framework`](https://github.com/CppCXY/LanguageServer.Framework)
+
+`NEW` 使用dotnet9 aot发布, 提高不少运行时性能, 但是内存使用差异不大
+
+`NOTE` `EmmyLua.LanguageServer.Framework`是由我重新开发的支持最新的LSP标准和兼容AOT编译的LSP框架, 有兴趣可以看看
+
+`NEW` 支持配置`workspace.ignoreGlobs`, 可以通过正则表达式排除目录, 具体格式参考Microsoft.Extensions.FileSystemGlobbing的文档:
+```json
+{
+  "workspace": {
+    "ignoreGlobs": [
+      "**/data/*"
+    ]
+  }
+}
+```
+
+# 0.8.1
+
+`FIX` 修复读取配置表时的性能问题
+
+`FIX` 修改了对其他编码的支持方式, 不再要求创建.emmyrc.json文件
+
+`FIX` 修复document color渲染时没有判断单词边界的问题
+
+`FIX` 修复泛型推断上的一些BUG
+
+`CHG` 移除了new函数默认返回自身类型的推断
+
+`NEW` 重构了声明分析系统
+
+`NEW` 支持string.format的格式参数展开
+
+`NEW` 支持通过注解`---@module no-require`表示一个文件不可以被require, 之后得代码补全不会出现他的require提示
+
+`NEW` 支持注解`---@mapping <new name>`表示一个字段/变量/函数可以映射到`<new name>`使用, 例如:
+```lua
+local t = {}
+---@mapping new
+t:ctor(a, b)
+
+t:new(1, 2)
+```
+
+# 0.8.0
+
+从这个版本开始, emmylua移除了java版本语言服务, 仅支持dotnet版本语言服务, 同时删除了所有以前为java版语言服务提供的配置. 
+
+`NEW` 调试器更新到1.8.2, 修复了tcpListen localhost时报错
+
+`FIX` 修复一个无限递归崩溃问题
+
+`CHG` 修改了hover的显示方式, 取消了对类的展开, 所有函数的签名参数会换行展示
+
+`CHG` 修改了codelens的实现方式
+
+`FIX` 处理了部分引用找不到的问题
+
+`FIX` 修复了hover上的Goto links的实现错误
+
+`FIX` 修复了参数Missing-parameter计算没有考虑不对成的定义和调用问题
+
+`NEW` 强化了document color的实现, 现在在字符串中的连续的6个或者8个16进制数字的组合被视为color
+
+`NEW` 重构了泛型系统, 泛型参数匹配支持前缀:
+```lua
+---@generic T
+---@param a UnityEngine.`T`
+---@return T
+local function f(a)
+    
+end
+
+local GameObject = f("GameObject") -- UnityEngine.GameObject
+```
+
+泛型现在可以展开函数参数, 请参考pcall和xpcall的声明, pcall和xpall现在会随着首个参数的类型改变签名
+
 # 0.7.7
 
 `FIX` 修复\u{xxx}为UTF8编码无效区的时候语言服务报错的BUG

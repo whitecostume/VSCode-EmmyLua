@@ -1,5 +1,264 @@
 # Change Log
 
+# next
+
+The next version will start from 0.9.0 and will focus on implementing type checking.
+
+# 0.8.20
+
+`FIX` Fixed the issue with incorrect function signature judgment during consecutive calls.
+
+`FIX` Fixed the inference problem when using alias types as keys.
+
+`FIX` Fixed the issue where completion for constant integer fields was not working:
+```lua
+---@class A
+---@field [1] string
+local a
+a[1] -- now can completion
+```
+
+`NEW` Optimized semantic tokens, which now only apply to documentation.
+
+`NOTE` 0.8.20 is the last release version in the 0.8.x series. The version number will be upgraded to 0.9.0 in the future.
+
+# 0.8.18
+
+`FIX` Fixed the issue where the code completion list for parameters with enum and alias included too many quotes.
+
+`FIX` Fixed the issue where inlineValues did not work during debugging.
+
+`NEW` '_' is not considered an unused variable.
+
+`NEW` Enum types can be used as keys and participate in inference.
+
+`NEW` Added new doc snippet completion. When selecting `param;@return` on a function statement, it will automatically complete the doc for parameters and return.
+
+`NEW` Fixed the error with multiple root directories on the IntelliJ platform.
+
+`NEW` Added support for code formatting, which is implemented through the pinvoke reference `EmmyLuaCodeStyle`.
+
+`NEW` VScode-EmmyLua-Unity plugin has been released. Users of Xlua can try installing and using it.
+
+`NEW` Intellij-EmmyLua2 plugin has been released. Users on the Jetbrains platform can try using this plugin, which internally integrates `EmmyLuaAnalyzer`, `EmmyLuaCodeStyle`, and `EmmyLuaDebugger` used in vscode. In the future, `intellij-emmylua2-unity` and `intellij-emmylua2-attachdebugger` will also be available.
+
+`NEW` Added configuration documentation: https://github.com/CppCXY/EmmyLuaAnalyzer/blob/master/docs/.emmyrc.json_EN.md
+
+# 0.8.17
+
+`FIX` Fixed the issue with incorrect Linux directories.
+
+`FIX` Fixed inference issues related to the `table<TKey, TValue>` annotation.
+
+`FIX` Fixed a bug where global variables marked as classes could not be referenced elsewhere.
+
+`NEW` Added support for the `@source "<uri>#<line>:<col>"` annotation. When a field has this annotation, jumping will go to the specified location in the source.
+
+`NEW` VSCode-EmmyLua-Unity will be released soon (August 8, 2024). The API exported using this plugin will follow the rules of xlua and support jumping to the corresponding C# implementation for fields.
+
+`NEW` Enum annotation `@enum` supports `key` attribute, for example:
+```lua
+---@enum (key) AAA
+---| CS.A.B.C AAA
+```
+This way, during code completion, it will automatically complete as `CS.A.B.C` instead of `AAA.CS.A.B.C`.
+
+# 0.8.16
+
+`CHG` All function return values are treated as new instances, and modifications to their return values are independent between different instances.
+
+`FIX` Fixed the bug where `_G` cannot be prompted and global variables cannot be added.
+
+`FIX` Fixed the bug where table generics cannot participate in inference.
+
+`NEW` Introduced a special generic type, `namespace<T : string>`, which attempts to reference namespaces. For example:
+```lua
+CS = {
+  ---@type namespace<"UnityEngine">
+  UnityEngine = {},
+  ---@type namespace<"System">
+  System = {},
+}
+
+```
+
+
+# 0.8.15
+
+`CHG` Refactored the underlying type system and index system.
+
+`FIX` Fixed inline values calculation error.
+
+`FIX` Fixed a bug where the return annotation was overridden by the function return type.
+
+`FIX` Fixed a bug where the param annotation couldn't be applied to the parameters of a for-in statement.
+
+`FIX` Fixed diagnostics issues with private and protected visibility.
+
+`CHG` Changed the logic of type members. Now, type members cannot be extended arbitrarily. The specific behaviors are as follows:
+* If a local variable is marked as `---@class`, other files cannot inject members into that class.
+* If a global variable is marked as `---@class`, members can be injected into that class from other files.
+* After a local variable is returned as a module, other files cannot inject members into that module.
+* A global variable can have members injected from any file.
+
+`NEW` Added support for attribute syntax for classes, e.g., `---@class (partial) A`, `---@enum (partial) B`.
+
+`NEW` Added support for partial class annotation. If a class is marked as a partial class, it needs to be declared as a partial class in other files to extend its members. For example, extending the string type:
+```lua
+---@class (partial) string
+local string = string
+
+function string:split(sep)
+end
+```
+
+`NEW` Added support for exact class annotation. If a class is marked as an exact class, only the members specified by `---@field` annotations can be used and defined. For example:
+
+```lua
+---@class (exact) AA
+---@field a number
+local AA = {}
+
+AA.b = 123 -- error
+AA.a = 456 -- ok
+
+```
+
+`NEW` Added diagnostics support for `inject-field-fail`, which is disabled by default.
+
+`NEW` Added diagnostics support for `duplicate-type`, which is enabled by default.
+
+`NEW` Code completion will hide members that are not visible based on visibility rules.
+
+`NEW` Introduced namespace annotation `---@namespace` to mark the namespace of the current file. For example:
+```lua
+---@namespace System
+```
+After specifying the namespace in the current file, all types defined in that file will be under the specified namespace. Classes within the same namespace can be accessed without writing the namespace prefix.
+
+`NEW` Introduced using annotation `---@using` to easily reference types from other namespaces. For example:
+```lua
+---@using System
+```
+After specifying the using annotation in the current file, types from the System namespace can be used directly. For example:
+```lua
+-- A.lua
+
+---@namespace System
+---@class FFI
+
+
+-- B.lua
+---@using System
+
+---@type FFI
+
+--- C.lua
+---@type System.FFI
+```
+
+`NEW` When defining a type, if the name contains a dot (.), a namespace will be automatically created. For example:
+```lua
+---@class System.FFC
+```
+
+`NEW` Improved reference lookup rules. When searching for references using the members of the current class, references in the current class will be prioritized, followed by references in all subclasses. References in parent classes will not be searched.
+
+`NEW` Improved code completion. When defining function statements with code snippet completion, the function definition will mimic the previous statement.
+
+
+# 0.8.12
+
+`FIX` Fixed code completion issues.
+
+`FIX` Fixed a bug where function return types couldn't be inferred.
+
+`NEW` Support for using `/` as a separator in require path suggestions, navigation, code analysis, and document links.
+
+# 0.8.10
+
+`NEW` Upgraded the version to 0.8.10, due to significant underlying changes, the version number was incremented by several versions, but from a binary perspective, version 10 is also version 2.
+
+`NEW` Upgraded the dotnet version to 9.0 preview.
+
+`CHG` Removed Newtonsoft.Json and replaced it with Text.Json. Removed omnisharp/csharp-language-server-protocol and replaced it with [EmmyLua.LanguageServer.Framework](https://github.com/CppCXY/LanguageServer.Framework).
+
+`NEW` Used dotnet9 AOT publishing to improve runtime performance, but there is not much difference in memory usage.
+
+`NOTE` EmmyLua.LanguageServer.Framework is a LSP framework that I have redeveloped to support the latest LSP standards and be compatible with AOT compilation. Feel free to check it out if you're interested.
+
+`NEW` Added support for configuring `workspace.ignoreGlobs` to exclude directories using regular expressions. Refer to the documentation of Microsoft.Extensions.FileSystemGlobbing for the specific format.
+```json
+{
+  "workspace": {
+    "ignoreGlobs": [
+      "**/data/*"
+    ]
+  }
+}
+```
+
+# 0.8.1
+
+`FIX` Fixed performance issues when reading configuration tables.
+
+`FIX` Changed the support method for other encodings, no longer requiring the creation of a .emmyrc.json file.
+
+`FIX` Fixed an issue where word boundaries were not considered during document color rendering.
+
+`FIX` Fixed some bugs in generic inference.
+
+`CHG` Removed the inference that the `new` function defaults to returning its own type.
+
+`NEW` Refactored the declaration analysis system.
+
+`NEW` Support for expanding format arguments in string.format.
+
+`NEW` Added support for using the annotation `---@module no-require` to indicate a file cannot be required, subsequent code completion will not show its require suggestion.
+
+`NEW` Added support for the annotation `---@mapping <new name>` to indicate a field/variable/function can be mapped to `<new name>` for use, for example:
+
+```lua
+local t = {}
+---@mapping new
+t:ctor(a, b)
+
+t:new(1, 2)
+```
+
+# 0.8.0
+
+Starting from this version, EmmyLua has removed the Java version of the language service and only supports the dotnet version of the language service, while also deleting all configurations previously provided for the Java version of the language service.
+
+`NEW` Debugger updated to 1.8.2, fixed an error when tcpListen localhost
+
+`FIX` Fixed an infinite recursion crash issue
+
+`CHG` Changed the display method of hover, cancelled the expansion for classes, all function signatures will be displayed with line breaks for parameters
+
+`CHG` Changed the implementation method of codelens
+
+`FIX` Addressed some issues where references could not be found
+
+`FIX` Fixed the implementation error of Goto links on hover
+
+`FIX` Fixed the calculation of Missing-parameter not considering mismatched definitions and calls
+
+`NEW` Enhanced the implementation of document color, now a sequence of 6 or 8 hexadecimal digits in a string is considered as color
+
+`NEW` Refactored the generic system, generic parameter matching supports prefix:
+```lua
+---@generic T
+---@param a UnityEngine.`T`
+---@return T
+local function f(a)
+    
+end
+
+local GameObject = f("GameObject") -- UnityEngine.GameObject
+```
+
+Now generics can expand function parameters, please refer to the declarations of pcall and xpcall, pcall and xpcall will now change their signatures based on the type of the first parameter.
 # 0.7.7
 
 `FIX` Fixed the bug where the language service reports an error when \u{xxx} is in the invalid area of UTF8 encoding
